@@ -1,3 +1,4 @@
+"use client"
 import { ChangeEvent, Component, MouseEvent } from "react"
 import styles from '../styles/Home.module.css'
 
