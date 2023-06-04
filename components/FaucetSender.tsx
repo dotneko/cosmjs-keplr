@@ -1,6 +1,6 @@
 "use client"
 import { Coin, StargateClient } from "@cosmjs/stargate"
-import { Window as KeplerWindow } from "@keplr-wallet/types"
+import { ChainInfo, Window as KeplerWindow } from "@keplr-wallet/types"
 import { ChangeEvent, Component, MouseEvent } from "react"
 import styles from '../styles/Home.module.css'
 
@@ -66,8 +66,86 @@ export class FaucetSender extends Component<FaucetSenderProps, FaucetSenderState
             alert("You need to install or unlock Keplr")
             return
         }
+        console.log("Connected to keplr")
+        // Get the current state and amount of tokens that we want to transfer
+        const { denom, toSend } = this.state
+        const { faucetAddress, rpcUrl } = this.props
+        console.log("To send: ", toSend, denom)
+        console.log("To address: ", faucetAddress)
+        console.log("Via rpc: ", rpcUrl)
+
+        // Suggest the testnet chain to Keplr
+        await keplr.experimentalSuggestChain(this.getTestnetChainInfo())
     }
 
+    // Get Cosmos Hub Testnet chain parameters
+    getTestnetChainInfo = (): ChainInfo => ({
+        chainId: "theta-testnet-001",
+        chainName: "theta-testnet-001",
+        rpc: "https://rpc.sentry-01.theta-testnet.polypore.xyz/",
+        rest: "https://rest.sentry-01.theta-testnet.polypore.xyz/",
+        bip44: {
+            coinType: 118,
+        },
+        bech32Config: {
+            bech32PrefixAccAddr: "cosmos",
+            bech32PrefixAccPub: "cosmos" + "pub",
+            bech32PrefixValAddr: "cosmos" + "valoper",
+            bech32PrefixValPub: "cosmos" + "valoperpub",
+            bech32PrefixConsAddr: "cosmos" + "valcons",
+            bech32PrefixConsPub: "cosmos" + "valconspub",
+        },
+        currencies: [
+            {
+                coinDenom: "ATOM",
+                coinMinimalDenom: "uatom",
+                coinDecimals: 6,
+                coinGeckoId: "cosmos",
+            },
+            {
+                coinDenom: "THETA",
+                coinMinimalDenom: "theta",
+                coinDecimals: 0,
+            },
+            {
+                coinDenom: "LAMBDA",
+                coinMinimalDenom: "lambda",
+                coinDecimals: 0,
+            },
+            {
+                coinDenom: "RHO",
+                coinMinimalDenom: "rho",
+                coinDecimals: 0,
+            },
+            {
+                coinDenom: "EPSILON",
+                coinMinimalDenom: "epsilon",
+                coinDecimals: 0,
+            },
+        ],
+        feeCurrencies: [
+            {
+                coinDenom: "ATOM",
+                coinMinimalDenom: "uatom",
+                coinDecimals: 6,
+                coinGeckoId: "cosmos",
+                gasPriceStep: {
+                    low: 1,
+                    average: 1,
+                    high: 1,
+                },
+            },
+        ],
+        stakeCurrency: {
+            coinDenom: "ATOM",
+            coinMinimalDenom: "uatom",
+            coinDecimals: 6,
+            coinGeckoId: "cosmos",
+        },
+        coinType: 118,
+        features: ["stargate", "ibc-transfer", "no-legacy-stdTx"],
+    })
+    
     // The render function that draws the component at init and at state change
     render() {
         const { denom, faucetBalance, myAddress, myBalance, toSend } = this.state
