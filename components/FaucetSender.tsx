@@ -1,7 +1,12 @@
 "use client"
 import { Coin, StargateClient } from "@cosmjs/stargate"
+import { Window as KeplerWindow } from "@keplr-wallet/types"
 import { ChangeEvent, Component, MouseEvent } from "react"
 import styles from '../styles/Home.module.css'
+
+declare global {
+    interface Window extends KeplerWindow {}
+}
 
 interface FaucetSenderState {
     denom: string
@@ -35,7 +40,7 @@ export class FaucetSender extends Component<FaucetSenderProps, FaucetSenderState
     init = async() => this.updateFaucetBalance(
         await StargateClient.connect(this.props.rpcUrl)
     )
-    
+
     // Get the faucet's balance
     updateFaucetBalance = async(client: StargateClient) => {
         const balances: readonly Coin[] = await client.getAllBalances(
@@ -56,7 +61,11 @@ export class FaucetSender extends Component<FaucetSenderProps, FaucetSenderState
 
     // When the user clicks the "send to faucet button"
     onSendClicked = async(e: MouseEvent<HTMLButtonElement>) => {
-        alert("TODO")
+        const { keplr } = window
+        if (!keplr) {
+            alert("You need to install or unlock Keplr")
+            return
+        }
     }
 
     // The render function that draws the component at init and at state change
